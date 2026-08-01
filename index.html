@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="mr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1565c0">
+<title>Daily Machine Production</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f3f6fa;color:#17202a}
+header{background:#1565c0;color:white;padding:16px;position:sticky;top:0;z-index:2}
+h1{font-size:20px;margin:0}.wrap{padding:12px;max-width:1100px;margin:auto}
+.card{background:white;border-radius:12px;padding:12px;margin:10px 0;box-shadow:0 2px 8px #0001}
+label{font-size:12px;font-weight:bold;display:block;margin:5px 0 3px}
+input,select,button{font-size:16px;padding:9px;border:1px solid #ccd4dd;border-radius:7px;box-sizing:border-box}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+button{background:#1565c0;color:white;border:0;margin:4px 2px}.secondary{background:#607d8b}.danger{background:#c62828}
+.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:900px}th,td{border:1px solid #d6dce2;padding:5px;text-align:center}th{background:#eaf1f8}td input{width:100%;min-width:70px}
+.machine{font-weight:bold;white-space:nowrap}.total{font-weight:bold;background:#f5f5f5}
+.small{font-size:12px;color:#5f6b76}.saved{color:#2e7d32;font-weight:bold}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header><h1>📝 DAILY MACHINE PRODUCTION & TIME REPORT</h1></header>
+<div class="wrap">
+<div class="card">
+<div class="grid">
+<div><label>Date</label><input id="date" type="date"></div>
+<div><label>Shift</label><select id="shift"><option>1st Shift</option><option>2nd Shift</option><option>General Shift</option></select></div>
+</div>
+</div>
+
+<div class="card">
+<h3>Production Entry</h3>
+<div class="tablewrap"><table id="prod"><thead><tr>
+<th>Sr.</th><th>Machine No.</th><th>Operator Name</th><th>Part Name</th><th>Part No.</th><th>Op. No.</th><th>Qty/Hr</th><th>OK</th><th>RW</th><th>MR</th><th>CR</th><th>Total</th>
+</tr></thead><tbody></tbody></table></div>
+</div>
+
+<div class="card">
+<h3>⏱️ Machine Time / Man-Hour Report</h3>
+<div class="tablewrap"><table id="time"><thead><tr>
+<th>Machine No.</th><th>M/C RUN TIME</th><th>IDLE TIME</th><th>SETTING</th><th>POWER OFF</th><th>MAINTANANCE</th><th>OPERATOR</th><th>GENERAL WORK</th><th>TOTAL</th>
+</tr></thead><tbody></tbody><tfoot><tr><th>GRAND TOTAL</th><th colspan="7"></th><th id="grand">0</th></tr></tfoot></table></div>
+<p class="small">Time 08:00–09:30 किंवा 1.5 Hrs अशा format मध्ये भरू शकता. Total मध्ये decimal hours साठी 1.5, 2, 0.5 इ. वापरा.</p>
+</div>
+
+<div class="card">
+<button onclick="save()">💾 Save Report</button>
+<button class="secondary" onclick="load()">📂 Load Saved Report</button>
+<button class="secondary" onclick="exportCSV()">📤 Export CSV</button>
+<button class="danger" onclick="clearForm()">🗑️ Clear</button>
+<p id="msg"></p>
+</div>
+</div>
+
+<script>
+const machines=["CNC 01","CNC 02","CNC 03","CNC 04","CNC 05","CNC 06","CNC 07","VMC 01","VMC 02","TMC 01"];
+const pbody=document.querySelector("#prod tbody"), tbody=document.querySelector("#time tbody");
+document.getElementById("date").value=new Date().toISOString().slice(0,10);
+
+machines.forEach((m,i)=>{
+let tr=document.createElement("tr");
+tr.innerHTML=`<td>${i+1}</td><td class="machine">${m}</td>
+<td><input data-p="op"></td><td><input data-p="part"></td><td><input data-p="partno"></td><td><input data-p="ono"></td>
+<td><input data-p="qhr" type="number" step="0.01"></td>
+<td><input data-p="ok" type="number" min="0" step="1" oninput="calcProd(this)"></td>
+<td><input data-p="rw" type="number" min="0" step="1" oninput="calcProd(this)"></td>
+<td><input data-p="mr" type="number" min="0" step="1" oninput="calcProd(this)"></td>
+<td><input data-p="cr" type="number" min="0" step="1" oninput="calcProd(this)"></td>
+<td class="total" data-total>0</td>`;
+pbody.appendChild(tr);
+
+let tt=document.createElement("tr");
+tt.innerHTML=`<td class="machine">${m}</td>${["run","idle","setting","power","maint","operator","general"].map(k=>`<td><input data-t="${k}" type="number" min="0" step="0.01" oninput="calcTime()"></td>`).join("")}<td class="total" data-ttotal>0</td>`;
+tbody.appendChild(tt);
+});
+
+function calcProd(el){
+let tr=el.closest("tr"), s=0;
+["ok","rw","mr","cr"].forEach(k=>s+=Number(tr.querySelector(`[data-p="${k}"]`).value)||0);
+tr.querySelector("[data-total]").textContent=s;
+}
+function calcTime(){
+let grand=0;
+tbody.querySelectorAll("tr").forEach(tr=>{
+let s=0;tr.querySelectorAll("input").forEach(x=>s+=Number(x.value)||0);
+tr.querySelector("[data-ttotal]").textContent=s.toFixed(2);grand+=s;
+});
+document.getElementById("grand").textContent=grand.toFixed(2);
+}
+function data(){
+return {date:date.value,shift:shift.value,prod:[...pbody.rows].map(tr=>[...tr.querySelectorAll("input")].map(x=>x.value)),
+time:[...tbody.rows].map(tr=>[...tr.querySelectorAll("input")].map(x=>x.value))};
+}
+function save(){localStorage.setItem("dailyProduction_"+date.value+"_"+shift.value,JSON.stringify(data()));msg.textContent="✓ Report saved on this phone.";msg.className="saved";}
+function load(){
+let x=localStorage.getItem("dailyProduction_"+date.value+"_"+shift.value);if(!x){msg.textContent="No saved report found.";return}
+let d=JSON.parse(x);d.prod.forEach((a,i)=>a.forEach((v,j)=>pbody.rows[i].querySelectorAll("input")[j].value=v));
+d.time.forEach((a,i)=>a.forEach((v,j)=>tbody.rows[i].querySelectorAll("input")[j].value=v));
+pbody.querySelectorAll("input").forEach(x=>x.dispatchEvent(new Event("input")));calcTime();msg.textContent="✓ Report loaded.";}
+function clearForm(){if(confirm("सर्व entries clear करायच्या आहेत का?")){document.querySelectorAll("input").forEach(x=>{if(x.type!="date")x.value=""});pbody.querySelectorAll("[data-total]").forEach(x=>x.textContent="0");calcTime();}}
+function exportCSV(){
+let d=data(), lines=["DAILY MACHINE PRODUCTION & TIME REPORT",`Date,${d.date}`,`Shift,${d.shift}`,"","Machine,Operator,Part Name,Part No,Op No,Qty/Hr,OK,RW,MR,CR,Total"];
+d.prod.forEach((a,i)=>lines.push([machines[i],...a,Number(a[6]||0)+Number(a[7]||0)+Number(a[8]||0)+Number(a[9]||0)].join(",")));
+lines.push("","Machine,Run,Idle,Setting,Power Off,Maintenance,Operator,General Work,Total");
+d.time.forEach((a,i)=>lines.push([machines[i],...a, a.reduce((s,v)=>s+(Number(v)||0),0).toFixed(2)].join(",")));
+let blob=new Blob([lines.join("\\n")],{type:"text/csv"}),u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=`Production_${d.date}_${d.shift}.csv`;a.click();URL.revokeObjectURL(u);
+}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js');}</script>
+</body></html>
