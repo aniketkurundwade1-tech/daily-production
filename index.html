@@ -1,111 +1,752 @@
-<!doctype html>
-<html lang="mr">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#1565c0">
-<title>Daily Machine Production</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Production - Machinewise</title>
+
 <style>
-body{font-family:Arial,sans-serif;margin:0;background:#f3f6fa;color:#17202a}
-header{background:#1565c0;color:white;padding:16px;position:sticky;top:0;z-index:2}
-h1{font-size:20px;margin:0}.wrap{padding:12px;max-width:1100px;margin:auto}
-.card{background:white;border-radius:12px;padding:12px;margin:10px 0;box-shadow:0 2px 8px #0001}
-label{font-size:12px;font-weight:bold;display:block;margin:5px 0 3px}
-input,select,button{font-size:16px;padding:9px;border:1px solid #ccd4dd;border-radius:7px;box-sizing:border-box}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-button{background:#1565c0;color:white;border:0;margin:4px 2px}.secondary{background:#607d8b}.danger{background:#c62828}
-.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:900px}th,td{border:1px solid #d6dce2;padding:5px;text-align:center}th{background:#eaf1f8}td input{width:100%;min-width:70px}
-.machine{font-weight:bold;white-space:nowrap}.total{font-weight:bold;background:#f5f5f5}
-.small{font-size:12px;color:#5f6b76}.saved{color:#2e7d32;font-weight:bold}
-@media(min-width:700px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f4f7fb;
+    color:#1f2937;
+}
+
+.container{
+    width:96%;
+    max-width:1500px;
+    margin:20px auto;
+    background:white;
+    border:1px solid #c9d5e3;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.header{
+    background:linear-gradient(90deg,#dceeff,#edf7ff,#dceeff);
+    border-bottom:1px solid #a9c7e5;
+    padding:15px;
+    text-align:center;
+}
+
+.header h1{
+    margin:0;
+    color:#07549a;
+    font-size:28px;
+}
+
+.required-note{
+    text-align:right;
+    padding:8px 15px 0;
+    font-size:14px;
+}
+
+.required{
+    color:#d00000;
+    font-weight:bold;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px 30px;
+    padding:15px 20px;
+}
+
+.field{
+    display:grid;
+    grid-template-columns:170px 1fr;
+    align-items:center;
+    gap:8px;
+}
+
+label{
+    font-weight:bold;
+    color:#163b61;
+}
+
+input,select,textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #b8c7d8;
+    border-radius:4px;
+    font-size:14px;
+    background:#fff;
+}
+
+input:focus,select:focus,textarea:focus{
+    outline:none;
+    border-color:#1671c8;
+    box-shadow:0 0 4px rgba(22,113,200,.25);
+}
+
+textarea{
+    resize:vertical;
+    min-height:42px;
+}
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    margin:0 20px 15px;
+    border:1px solid #aac4df;
+}
+
+.summary-box{
+    padding:12px;
+    text-align:center;
+    background:#eef7ff;
+    border-right:1px solid #aac4df;
+}
+
+.summary-box:last-child{
+    border-right:0;
+}
+
+.summary-title{
+    display:block;
+    color:#174b7c;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.summary-value{
+    font-size:20px;
+    font-weight:bold;
+    color:#07549a;
+}
+
+.section-title{
+    margin:15px 20px 0;
+    background:#dceeff;
+    border:1px solid #aac4df;
+    padding:10px;
+    color:#07549a;
+    font-weight:bold;
+}
+
+.table-wrap{
+    overflow-x:auto;
+    margin:0 20px;
+    border:1px solid #aac4df;
+}
+
+table{
+    width:100%;
+    min-width:1200px;
+    border-collapse:collapse;
+}
+
+th{
+    background:#e8f4ff;
+    color:#174b7c;
+    border:1px solid #aac4df;
+    padding:10px 6px;
+    font-size:13px;
+}
+
+td{
+    border:1px solid #c5d3e0;
+    padding:7px;
+    text-align:center;
+}
+
+td input{
+    min-width:75px;
+    padding:7px;
+}
+
+.product-input{
+    min-width:180px;
+}
+
+.down-time{
+    display:grid;
+    grid-template-columns:1fr 220px 1.5fr;
+    gap:15px;
+    margin:0 20px 20px;
+    padding:15px;
+    border:1px solid #aac4df;
+    background:#f8fbff;
+}
+
+.down-time label{
+    display:block;
+    margin-bottom:5px;
+}
+
+.buttons{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    padding:10px 20px 25px;
+}
+
+button{
+    border:0;
+    border-radius:5px;
+    padding:12px 45px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.save{
+    background:#0868bd;
+    color:white;
+}
+
+.save:hover{
+    background:#064f91;
+}
+
+.cancel{
+    background:#6b7280;
+    color:white;
+}
+
+.cancel:hover{
+    background:#4b5563;
+}
+
+.message{
+    display:none;
+    margin:0 20px 15px;
+    padding:12px;
+    text-align:center;
+    background:#e8f8ed;
+    color:#08752e;
+    border:1px solid #9bd4ad;
+    border-radius:5px;
+    font-weight:bold;
+}
+
+/* Mobile */
+@media(max-width:800px){
+
+    .container{
+        width:100%;
+        margin:0;
+        border-radius:0;
+    }
+
+    .header h1{
+        font-size:22px;
+    }
+
+    .required-note{
+        font-size:12px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+        padding:12px;
+    }
+
+    .field{
+        grid-template-columns:1fr;
+        gap:4px;
+    }
+
+    .summary{
+        grid-template-columns:repeat(2,1fr);
+        margin:10px 12px;
+    }
+
+    .summary-box{
+        border-bottom:1px solid #aac4df;
+    }
+
+    .section-title{
+        margin:12px;
+    }
+
+    .table-wrap{
+        margin:0 12px;
+    }
+
+    .down-time{
+        grid-template-columns:1fr;
+        margin:0 12px 15px;
+    }
+
+    .buttons{
+        padding-bottom:20px;
+    }
+
+    button{
+        width:45%;
+        padding:12px 10px;
+    }
+}
 </style>
 </head>
+
 <body>
-<header><h1>📝 DAILY MACHINE PRODUCTION & TIME REPORT</h1></header>
-<div class="wrap">
-<div class="card">
-<div class="grid">
-<div><label>Date</label><input id="date" type="date"></div>
-<div><label>Shift</label><select id="shift"><option>1st Shift</option><option>2nd Shift</option><option>General Shift</option></select></div>
-</div>
-</div>
 
-<div class="card">
-<h3>Production Entry</h3>
-<div class="tablewrap"><table id="prod"><thead><tr>
-<th>Sr.</th><th>Machine No.</th><th>Operator Name</th><th>Part Name</th><th>Part No.</th><th>Op. No.</th><th>Qty/Hr</th><th>OK</th><th>RW</th><th>MR</th><th>CR</th><th>Total</th>
-</tr></thead><tbody></tbody></table></div>
-</div>
+<div class="container">
 
-<div class="card">
-<h3>⏱️ Machine Time / Man-Hour Report</h3>
-<div class="tablewrap"><table id="time"><thead><tr>
-<th>Machine No.</th><th>M/C RUN TIME</th><th>IDLE TIME</th><th>SETTING</th><th>POWER OFF</th><th>MAINTANANCE</th><th>OPERATOR</th><th>GENERAL WORK</th><th>TOTAL</th>
-</tr></thead><tbody></tbody><tfoot><tr><th>GRAND TOTAL</th><th colspan="7"></th><th id="grand">0</th></tr></tfoot></table></div>
-<p class="small">Time 08:00–09:30 किंवा 1.5 Hrs अशा format मध्ये भरू शकता. Total मध्ये decimal hours साठी 1.5, 2, 0.5 इ. वापरा.</p>
-</div>
+    <div class="header">
+        <h1>Daily Production - Machinewise</h1>
+    </div>
 
-<div class="card">
-<button onclick="save()">💾 Save Report</button>
-<button class="secondary" onclick="load()">📂 Load Saved Report</button>
-<button class="secondary" onclick="exportCSV()">📤 Export CSV</button>
-<button class="danger" onclick="clearForm()">🗑️ Clear</button>
-<p id="msg"></p>
-</div>
+    <div class="required-note">
+        <span class="required">*</span> Mandatory fields marked as red
+    </div>
+
+    <!-- BASIC DETAILS -->
+    <div class="form-grid">
+
+        <div class="field">
+            <label>Production Date <span class="required">*</span></label>
+            <input type="date" id="productionDate">
+        </div>
+
+        <div class="field">
+            <label>Machine Name <span class="required">*</span></label>
+            <select id="machineName">
+                <option value="">Select Machine</option>
+                <option>CNC 01</option>
+                <option>CNC 02</option>
+                <option>CNC 03</option>
+                <option>CNC 04</option>
+                <option>CNC 05</option>
+                <option>CNC 06</option>
+                <option>CNC 07</option>
+                <option>VMC 01</option>
+                <option>VMC 02</option>
+                <option>TMC 01</option>
+                <option>AUTOMATIC BANDSAW 1</option>
+                <option>AUTOMATIC BANDSAW 2</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Shift <span class="required">*</span></label>
+            <select id="shift">
+                <option value="">Select Shift</option>
+                <option>1</option>
+                <option>2</option>
+                <option>General</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Line <span class="required">*</span></label>
+            <input type="text" id="line" placeholder="Enter Line">
+        </div>
+
+        <div class="field">
+            <label>Supervisor Name <span class="required">*</span></label>
+            <input type="text" id="supervisorName" placeholder="Enter Supervisor Name">
+        </div>
+
+        <div class="field">
+            <label>Supervisor <span class="required">*</span></label>
+            <input type="text" id="supervisor" placeholder="Enter Supervisor">
+        </div>
+
+        <div class="field">
+            <label>Operator Name <span class="required">*</span></label>
+            <input type="text" id="operatorName" placeholder="Enter Operator Name">
+        </div>
+
+        <div class="field">
+            <label>Stock Location <span class="required">*</span></label>
+            <select id="stockLocation">
+                <option value="">Select Location</option>
+                <option>MAIN STORE</option>
+                <option>CUTTING SECTION</option>
+                <option>WIP</option>
+                <option>FINISHED GOODS</option>
+                <option>REJECTION AREA</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Operation <span class="required">*</span></label>
+            <input type="text" id="operation" placeholder="Enter Operation">
+        </div>
+
+        <div class="field">
+            <label>Time (Min) <span class="required">*</span></label>
+            <input type="number" id="time" value="0" min="0">
+        </div>
+
+        <div class="field">
+            <label>Number of Settings</label>
+            <input type="number" id="settings" value="0" min="0">
+        </div>
+
+        <div class="field">
+            <label>Utilized Time</label>
+            <input type="number" id="utilizedTime" value="0" min="0">
+        </div>
+
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary">
+
+        <div class="summary-box">
+            <span class="summary-title">Availability</span>
+            <span class="summary-value">100%</span>
+        </div>
+
+        <div class="summary-box">
+            <span class="summary-title">Performance</span>
+            <span class="summary-value">100%</span>
+        </div>
+
+        <div class="summary-box">
+            <span class="summary-title">Quality</span>
+            <span class="summary-value" id="quality">100%</span>
+        </div>
+
+        <div class="summary-box">
+            <span class="summary-title">OEE</span>
+            <span class="summary-value" id="oee">100%</span>
+        </div>
+
+        <div class="summary-box">
+            <span class="summary-title">Production / Hour</span>
+            <span class="summary-value" id="productionHour">0</span>
+        </div>
+
+    </div>
+
+    <!-- PRODUCTION TABLE -->
+    <div class="section-title">
+        Production Details
+    </div>
+
+    <div class="table-wrap">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Operation</th>
+                    <th>Cycle Time</th>
+                    <th>L/U Time</th>
+                    <th>Plan Qty.</th>
+                    <th>OK Qty.</th>
+                    <th>MR Qty.</th>
+                    <th>CR Qty.</th>
+                    <th>Rework Qty.</th>
+                    <th>POR Qty.</th>
+                    <th>Hold Qty.</th>
+                    <th>Total Qty.</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>
+                        <input class="product-input" id="productName"
+                        placeholder="Product Name">
+                    </td>
+
+                    <td>
+                        <input id="productOperation"
+                        placeholder="Operation">
+                    </td>
+
+                    <td>
+                        <input type="number" id="cycleTime"
+                        value="0" min="0">
+                    </td>
+
+                    <td>
+                        <input type="number" id="luTime"
+                        value="0" min="0">
+                    </td>
+
+                    <td>
+                        <input type="number" id="planQty"
+                        value="0" min="0">
+                    </td>
+
+                    <td>
+                        <input type="number" id="okQty"
+                        value="0" min="0"
+                        oninput="calculate()">
+                    </td>
+
+                    <td>
+                        <input type="number" id="mrQty"
+                        value="0" min="0"
+                        oninput="calculate()">
+                    </td>
+
+                    <td>
+                        <input type="number" id="crQty"
+                        value="0" min="0">
+                    </td>
+
+                    <td>
+                        <input type="number" id="reworkQty"
+                        value="0" min="0">
+                    </td>
+
+                    <td>
+                        <input type="number" id="porQty"
+                        value="0" min="0">
+                    </td>
+
+                    <td>
+                        <input type="number" id="holdQty"
+                        value="0" min="0">
+                    </td>
+
+                    <td>
+                        <input type="number" id="totalQty"
+                        value="0" readonly>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- DOWN TIME -->
+    <div class="section-title">
+        Machine Down Time
+    </div>
+
+    <div class="down-time">
+
+        <div>
+            <label>Machine Down Time Reason</label>
+            <input type="text" id="downReason"
+            placeholder="Enter Down Time Reason">
+        </div>
+
+        <div>
+            <label>Down Time (Min)</label>
+            <input type="number" id="downTime"
+            value="0" min="0">
+        </div>
+
+        <div>
+            <label>Remark</label>
+            <textarea id="remark"
+            placeholder="Enter Remark"></textarea>
+        </div>
+
+    </div>
+
+    <div class="message" id="message">
+        Production data saved successfully!
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="buttons">
+
+        <button class="save" onclick="saveData()">
+            Save
+        </button>
+
+        <button class="cancel" onclick="resetForm()">
+            Cancel
+        </button>
+
+    </div>
+
 </div>
 
 <script>
-const machines=["CNC 01","CNC 02","CNC 03","CNC 04","CNC 05","CNC 06","CNC 07","VMC 01","VMC 02","TMC 01"];
-const pbody=document.querySelector("#prod tbody"), tbody=document.querySelector("#time tbody");
-document.getElementById("date").value=new Date().toISOString().slice(0,10);
 
-machines.forEach((m,i)=>{
-let tr=document.createElement("tr");
-tr.innerHTML=`<td>${i+1}</td><td class="machine">${m}</td>
-<td><input data-p="op"></td><td><input data-p="part"></td><td><input data-p="partno"></td><td><input data-p="ono"></td>
-<td><input data-p="qhr" type="number" step="0.01"></td>
-<td><input data-p="ok" type="number" min="0" step="1" oninput="calcProd(this)"></td>
-<td><input data-p="rw" type="number" min="0" step="1" oninput="calcProd(this)"></td>
-<td><input data-p="mr" type="number" min="0" step="1" oninput="calcProd(this)"></td>
-<td><input data-p="cr" type="number" min="0" step="1" oninput="calcProd(this)"></td>
-<td class="total" data-total>0</td>`;
-pbody.appendChild(tr);
+/* Today's Date */
+const today = new Date();
+document.getElementById("productionDate").value =
+today.toISOString().split("T")[0];
 
-let tt=document.createElement("tr");
-tt.innerHTML=`<td class="machine">${m}</td>${["run","idle","setting","power","maint","operator","general"].map(k=>`<td><input data-t="${k}" type="number" min="0" step="0.01" oninput="calcTime()"></td>`).join("")}<td class="total" data-ttotal>0</td>`;
-tbody.appendChild(tt);
-});
 
-function calcProd(el){
-let tr=el.closest("tr"), s=0;
-["ok","rw","mr","cr"].forEach(k=>s+=Number(tr.querySelector(`[data-p="${k}"]`).value)||0);
-tr.querySelector("[data-total]").textContent=s;
+/* Calculate Total & Quality */
+function calculate(){
+
+    let ok = Number(document.getElementById("okQty").value) || 0;
+    let mr = Number(document.getElementById("mrQty").value) || 0;
+
+    let total = ok + mr;
+
+    document.getElementById("totalQty").value = total;
+
+    if(total > 0){
+
+        let quality = (ok / total) * 100;
+
+        document.getElementById("quality").innerText =
+        quality.toFixed(2) + "%";
+
+        document.getElementById("oee").innerText =
+        quality.toFixed(2) + "%";
+
+    }else{
+
+        document.getElementById("quality").innerText = "100%";
+        document.getElementById("oee").innerText = "100%";
+    }
+
+    let cycle = Number(document.getElementById("cycleTime").value) || 0;
+
+    if(cycle > 0){
+
+        let production =
+        Math.floor(60 / cycle);
+
+        document.getElementById("productionHour").innerText =
+        production;
+
+    }else{
+
+        document.getElementById("productionHour").innerText = "0";
+    }
 }
-function calcTime(){
-let grand=0;
-tbody.querySelectorAll("tr").forEach(tr=>{
-let s=0;tr.querySelectorAll("input").forEach(x=>s+=Number(x.value)||0);
-tr.querySelector("[data-ttotal]").textContent=s.toFixed(2);grand+=s;
-});
-document.getElementById("grand").textContent=grand.toFixed(2);
+
+
+/* Save */
+function saveData(){
+
+    const machine =
+    document.getElementById("machineName").value;
+
+    const operator =
+    document.getElementById("operatorName").value;
+
+    if(machine === "" || operator === ""){
+
+        alert("Please fill all mandatory fields.");
+        return;
+    }
+
+    const data = {
+
+        productionDate:
+        document.getElementById("productionDate").value,
+
+        shift:
+        document.getElementById("shift").value,
+
+        machine:
+        machine,
+
+        line:
+        document.getElementById("line").value,
+
+        supervisorName:
+        document.getElementById("supervisorName").value,
+
+        supervisor:
+        document.getElementById("supervisor").value,
+
+        operator:
+        operator,
+
+        stockLocation:
+        document.getElementById("stockLocation").value,
+
+        operation:
+        document.getElementById("operation").value,
+
+        time:
+        document.getElementById("time").value,
+
+        settings:
+        document.getElementById("settings").value,
+
+        productName:
+        document.getElementById("productName").value,
+
+        planQty:
+        document.getElementById("planQty").value,
+
+        okQty:
+        document.getElementById("okQty").value,
+
+        mrQty:
+        document.getElementById("mrQty").value,
+
+        crQty:
+        document.getElementById("crQty").value,
+
+        reworkQty:
+        document.getElementById("reworkQty").value,
+
+        porQty:
+        document.getElementById("porQty").value,
+
+        holdQty:
+        document.getElementById("holdQty").value,
+
+        totalQty:
+        document.getElementById("totalQty").value,
+
+        downReason:
+        document.getElementById("downReason").value,
+
+        downTime:
+        document.getElementById("downTime").value,
+
+        remark:
+        document.getElementById("remark").value,
+
+        savedAt:
+        new Date().toLocaleString()
+    };
+
+    localStorage.setItem(
+        "dailyProductionData",
+        JSON.stringify(data)
+    );
+
+    document.getElementById("message").style.display = "block";
+
+    setTimeout(function(){
+
+        document.getElementById("message").style.display = "none";
+
+    },3000);
+
 }
-function data(){
-return {date:date.value,shift:shift.value,prod:[...pbody.rows].map(tr=>[...tr.querySelectorAll("input")].map(x=>x.value)),
-time:[...tbody.rows].map(tr=>[...tr.querySelectorAll("input")].map(x=>x.value))};
+
+
+/* Reset */
+function resetForm(){
+
+    if(confirm("Clear all entered data?")){
+
+        document.querySelectorAll("input, textarea, select")
+        .forEach(function(element){
+
+            if(element.id !== "productionDate"){
+                element.value = "";
+            }
+
+        });
+
+        document.getElementById("settings").value = 0;
+        document.getElementById("time").value = 0;
+        document.getElementById("utilizedTime").value = 0;
+
+        document.getElementById("totalQty").value = 0;
+
+        document.getElementById("quality").innerText = "100%";
+        document.getElementById("oee").innerText = "100%";
+        document.getElementById("productionHour").innerText = "0";
+    }
 }
-function save(){localStorage.setItem("dailyProduction_"+date.value+"_"+shift.value,JSON.stringify(data()));msg.textContent="✓ Report saved on this phone.";msg.className="saved";}
-function load(){
-let x=localStorage.getItem("dailyProduction_"+date.value+"_"+shift.value);if(!x){msg.textContent="No saved report found.";return}
-let d=JSON.parse(x);d.prod.forEach((a,i)=>a.forEach((v,j)=>pbody.rows[i].querySelectorAll("input")[j].value=v));
-d.time.forEach((a,i)=>a.forEach((v,j)=>tbody.rows[i].querySelectorAll("input")[j].value=v));
-pbody.querySelectorAll("input").forEach(x=>x.dispatchEvent(new Event("input")));calcTime();msg.textContent="✓ Report loaded.";}
-function clearForm(){if(confirm("सर्व entries clear करायच्या आहेत का?")){document.querySelectorAll("input").forEach(x=>{if(x.type!="date")x.value=""});pbody.querySelectorAll("[data-total]").forEach(x=>x.textContent="0");calcTime();}}
-function exportCSV(){
-let d=data(), lines=["DAILY MACHINE PRODUCTION & TIME REPORT",`Date,${d.date}`,`Shift,${d.shift}`,"","Machine,Operator,Part Name,Part No,Op No,Qty/Hr,OK,RW,MR,CR,Total"];
-d.prod.forEach((a,i)=>lines.push([machines[i],...a,Number(a[6]||0)+Number(a[7]||0)+Number(a[8]||0)+Number(a[9]||0)].join(",")));
-lines.push("","Machine,Run,Idle,Setting,Power Off,Maintenance,Operator,General Work,Total");
-d.time.forEach((a,i)=>lines.push([machines[i],...a, a.reduce((s,v)=>s+(Number(v)||0),0).toFixed(2)].join(",")));
-let blob=new Blob([lines.join("\\n")],{type:"text/csv"}),u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=`Production_${d.date}_${d.shift}.csv`;a.click();URL.revokeObjectURL(u);
-}
-if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js');}</script>
-</body></html>
+
+</script>
+
+</body>
+                          </html>
